@@ -52,9 +52,9 @@ function AdminLoginDialog({ preview, onClose, onSubmit }) {
         <span><strong>Connect Supabase to enable sign-in</strong><br />Set <code>VITE_SUPABASE_URL</code> and <code>VITE_SUPABASE_ANON_KEY</code>, run <code>supabase/schema.sql</code>, then add your user to <code>feedback_admins</code>.</span>
       </div>}
       <form onSubmit={onSubmit} className="feedback-form">
-        <label>Email<input name="email" type="email" required autoComplete="username" placeholder="you@company.com" disabled={preview} /></label>
-        <label>Password<input name="password" type="password" required autoComplete="current-password" placeholder="Your password" disabled={preview} /></label>
-        <button className="primary-button form-submit" type="submit" disabled={preview}><LogIn size={15} />{preview ? 'Configure Supabase to sign in' : 'Sign in'}</button>
+        <label>Email<input name="email" type="email" required autoComplete="username" placeholder="you@company.com" /></label>
+        <label>Password<input name="password" type="password" required autoComplete="current-password" placeholder="Your password" /></label>
+        <button className="primary-button form-submit" type="submit"><LogIn size={15} />Sign in</button>
       </form>
     </section>
   </div>
