@@ -39,6 +39,27 @@ function timeAgo(value) {
   return days < 7 ? `${days}d ago` : new Date(value).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })
 }
 
+function AdminLoginDialog({ preview, onClose, onSubmit }) {
+  return <div className="modal-backdrop" onMouseDown={(event) => { if (event.target === event.currentTarget) onClose() }}>
+    <section className="dialog login-dialog" role="dialog" aria-modal="true" aria-labelledby="login-title">
+      <button className="dialog-close" type="button" onClick={onClose} aria-label="Close"><X size={18} /></button>
+      <div className="dialog-mark"><Settings2 size={18} /></div>
+      <div className="dialog-kicker">WORKSPACE ACCESS</div>
+      <h2 id="login-title">Admin sign in</h2>
+      <p className="dialog-intro">Sign in with your workspace admin account to manage feedback.</p>
+      {preview && <div className="setup-callout" role="status">
+        <CircleHelp size={17} />
+        <span><strong>Connect Supabase to enable sign-in</strong><br />Set <code>VITE_SUPABASE_URL</code> and <code>VITE_SUPABASE_ANON_KEY</code>, run <code>supabase/schema.sql</code>, then add your user to <code>feedback_admins</code>.</span>
+      </div>}
+      <form onSubmit={onSubmit} className="feedback-form">
+        <label>Email<input name="email" type="email" required autoComplete="username" placeholder="you@company.com" disabled={preview} /></label>
+        <label>Password<input name="password" type="password" required autoComplete="current-password" placeholder="Your password" disabled={preview} /></label>
+        <button className="primary-button form-submit" type="submit" disabled={preview}><LogIn size={15} />{preview ? 'Configure Supabase to sign in' : 'Sign in'}</button>
+      </form>
+    </section>
+  </div>
+}
+
 export default function App() {
   const [ideas, setIdeas] = useState(() => supabase ? [] : getPreviewIdeas())
   const [loading, setLoading] = useState(Boolean(supabase))
@@ -131,6 +152,7 @@ export default function App() {
 
   const signIn = async (event) => {
     event.preventDefault()
+    if (!supabase) { setToast('Configure Supabase before signing in.'); return }
     const form = new FormData(event.currentTarget)
     const { error } = await supabase.auth.signInWithPassword({ email: form.get('email'), password: form.get('password') })
     if (error) { setToast(error.message); return }
@@ -160,7 +182,7 @@ export default function App() {
       <footer className="page-footer"><span>Built with care by Northstar Studio</span><a href="mailto:hello@northstar.example">Questions? Get in touch <ArrowUpRight size={12} /></a></footer>
     </main>
     {modal === 'submit' && <div className="modal-backdrop" onMouseDown={(event) => { if (event.target === event.currentTarget) setModal('') }}><section className="dialog" role="dialog" aria-modal="true" aria-labelledby="submit-title"><button className="dialog-close" type="button" onClick={() => setModal('')} aria-label="Close"><X size={18} /></button><div className="dialog-mark"><Lightbulb size={19} /></div><div className="dialog-kicker">YOUR VOICE MATTERS</div><h2 id="submit-title">Share an idea</h2><p className="dialog-intro">Tell us what's on your mind. The more detail, the better.</p><form onSubmit={submitIdea} className="feedback-form"><label>Idea title<input name="title" required minLength="3" maxLength="120" placeholder="A short, clear summary" /></label><label>Tell us more<textarea name="description" required minLength="3" maxLength="2000" rows="4" placeholder="What would you like to see? How would it help?" /></label><div className="form-row"><label>Category<select name="category"><option>Feature</option><option>Improvement</option><option>Bug</option></select></label><label>Your name <span className="optional">(optional)</span><input name="author_name" maxLength="60" placeholder="How should we credit you?" /></label></div>{preview && <div className="form-hint"><CircleHelp size={14} /> Preview submissions are saved only in this browser.</div>}<button className="primary-button form-submit" type="submit" disabled={submitting}><Send size={15} />{submitting ? 'Sharing…' : 'Share feedback'}</button></form></section></div>}
-    {modal === 'login' && <div className="modal-backdrop" onMouseDown={(event) => { if (event.target === event.currentTarget) setModal('') }}><section className="dialog login-dialog" role="dialog" aria-modal="true" aria-labelledby="login-title"><button className="dialog-close" type="button" onClick={() => setModal('')} aria-label="Close"><X size={18} /></button><div className="dialog-mark"><Settings2 size={18} /></div><div className="dialog-kicker">WORKSPACE ACCESS</div><h2 id="login-title">Admin sign in</h2><p className="dialog-intro">Sign in with your workspace admin account to manage feedback.</p>{preview ? <div className="setup-callout"><CircleHelp size={17} /><span><strong>Cloud setup needed</strong><br />Add your Supabase project URL and anon key to <code>.env</code> to enable admin sign-in.</span></div> : <form onSubmit={signIn} className="feedback-form"><label>Email<input name="email" type="email" required autoComplete="username" placeholder="you@company.com" /></label><label>Password<input name="password" type="password" required autoComplete="current-password" placeholder="Your password" /></label><button className="primary-button form-submit" type="submit"><LogIn size={15} /> Sign in</button></form>}</section></div>}
+    {modal === 'login' && <AdminLoginDialog preview={preview} onClose={() => setModal('')} onSubmit={signIn} />}
     {toast && <div className="toast" role="status"><span className="toast-check"><Check size={14} /></span>{toast}<button type="button" aria-label="Dismiss notification" onClick={() => setToast('')}><X size={14} /></button></div>}
   </div>
 }
