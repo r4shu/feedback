@@ -116,7 +116,7 @@ export default function App() {
       <div className="workspace-label">WORKSPACE</div>
       <div className="workspace-picker"><span className="workspace-avatar">N</span><span className="workspace-name">Northstar Studio<small>Product feedback</small></span><ChevronDown size={15} /></div>
       <div className="nav-label">YOUR SPACE</div>
-      <nav className="side-nav" aria-label="Main navigation"><a className="side-link active" href="#board"><MessageSquareText size={17} /> Feedback board <span className="nav-count">{ideas.length}</span></a><a className="side-link" href="#board" onClick={() => setSort('Most votes')}><Lightbulb size={17} /> Roadmap <ArrowUpRight className="external-icon" size={14} /></a></nav>
+      <nav className="side-nav" aria-label="Main navigation"><a className="side-link active" href="#board"><MessageSquareText size={17} /> Feedback board <span className="nav-count">{ideas.length}</span></a></nav>
       <div className="sidebar-spacer" />
       <div className="sidebar-note"><div className="note-icon"><Sparkles size={15} /></div><p>Good ideas grow<br />better together.</p><span>Make your voice count.</span></div>
     </aside>
