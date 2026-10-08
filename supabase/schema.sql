@@ -11,11 +11,6 @@ create table if not exists public.feedback (
   created_at timestamptz not null default now()
 );
 
-create table if not exists public.feedback_admins (
-  user_id uuid primary key references auth.users(id) on delete cascade,
-  created_at timestamptz not null default now()
-);
-
 create table if not exists public.feedback_votes (
   feedback_id uuid not null references public.feedback(id) on delete cascade,
   voter_id uuid not null,
@@ -27,7 +22,6 @@ create index if not exists feedback_created_at_idx on public.feedback (created_a
 create index if not exists feedback_votes_count_idx on public.feedback (votes_count desc);
 
 alter table public.feedback enable row level security;
-alter table public.feedback_admins enable row level security;
 alter table public.feedback_votes enable row level security;
 
 drop policy if exists "Anyone can read feedback" on public.feedback;
@@ -38,13 +32,7 @@ create policy "Anyone can submit feedback" on public.feedback for insert to anon
   with check (status = 'open' and votes_count = 0);
 
 drop policy if exists "Admins can update feedback" on public.feedback;
-create policy "Admins can update feedback" on public.feedback for update to authenticated
-  using (exists (select 1 from public.feedback_admins a where a.user_id = (select auth.uid())))
-  with check (exists (select 1 from public.feedback_admins a where a.user_id = (select auth.uid())));
-
-drop policy if exists "Admins can read their own admin record" on public.feedback_admins;
-create policy "Admins can read their own admin record" on public.feedback_admins for select to authenticated
-  using (user_id = (select auth.uid()));
+revoke update on public.feedback from authenticated;
 
 create or replace function public.toggle_feedback_vote(p_feedback_id uuid, p_voter_id uuid)
 returns boolean
@@ -86,8 +74,6 @@ revoke all on function public.toggle_feedback_vote(uuid, uuid) from public;
 grant execute on function public.toggle_feedback_vote(uuid, uuid) to anon, authenticated;
 
 grant select, insert on public.feedback to anon, authenticated;
-grant update on public.feedback to authenticated;
-grant select on public.feedback_admins to authenticated;
 
 do $$
 begin
@@ -101,6 +87,3 @@ exception when undefined_object then
   raise notice 'Supabase Realtime publication is not available; enable Realtime for public.feedback in the dashboard.';
 end;
 $$;
-
--- Create an admin account in Supabase Authentication, then register that user's UUID:
--- insert into public.feedback_admins (user_id) values ('00000000-0000-0000-0000-000000000000');

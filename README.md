@@ -1,6 +1,6 @@
 # Signal feedback board
 
-A responsive feedback board with public idea submissions, community voting, live updates, and authenticated admin status management. Supabase provides shared cloud storage and authentication. Without cloud credentials, the app opens in a clearly labeled local preview that stores sample feedback, submissions, and votes in this browser.
+A responsive public feedback board with idea submissions, community voting, and live updates. Supabase provides shared cloud storage. Without cloud credentials, the app opens in a clearly labeled local preview that stores sample feedback, submissions, and votes in this browser.
 
 ## Run locally
 
@@ -13,11 +13,9 @@ A responsive feedback board with public idea submissions, community voting, live
 
 1. Create a Supabase project. Set `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` in `.env` to the project URL and publishable/anon key.
 2. Open the Supabase SQL Editor and run [`supabase/schema.sql`](supabase/schema.sql).
-3. In Supabase Authentication, create an email/password user for each workspace admin. Copy each user's UUID from the Authentication users list.
-4. In the SQL Editor, register each admin: `insert into public.feedback_admins (user_id) values ('USER_UUID');`.
-5. Restart the Vite server after changing `.env`.
+3. Restart the Vite server after changing `.env`.
 
-The anon key is intended to be public in a browser app. Row-level security protects writes and admin-only status updates. Never add a Supabase service-role key to this project.
+The anon key is intended to be public in a browser app. Row-level security protects feedback writes. Never add a Supabase service-role key to this project.
 
 ## Deploy to Vercel
 
@@ -32,5 +30,5 @@ The anon key is intended to be public in a browser app. Row-level security prote
 - Search, filter by category, and sort by votes or recency.
 - Toggle a vote per idea from the current browser.
 - Receive feedback updates over Supabase Realtime.
-- Sign in as an admin and update idea statuses.
+- Browse the [GitHub repository](https://github.com/r4shu/feedback).
 - Preview the board without a cloud project.
